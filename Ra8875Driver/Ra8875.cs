@@ -50,7 +50,7 @@ public class Ra8875
         
         // Horizontal setup
         var fineTuning = Hndftr.LowPolarity & 0x11;
-        WriteRegister(Registers.Hdwr, (byte)(_width / 8 - 1)); // pixels = (HDWR + 1) * 8
+        WriteRegister(Registers.Hdwr, (byte)(_width / 8 - 1)); 
         WriteRegister(Registers.Hndftr, Hndftr.LowPolarity & 0x11); // fine tuning
         // WriteRegister(Registers.Hndr, _width ); // pixels = (hndr + 1)*8 + (hdnftr/2 + 1)*2 + 2
     }
