@@ -17,6 +17,7 @@ public class Ra8875
     private readonly IDigitalOutputPort _chipSelect;
     private readonly byte[] _outputBuffer = new byte[2];
     private readonly int _height, _width;
+    private readonly DisplayType _displayType;
 
     public Ra8875(
         ISpiBus spiBus,
@@ -24,14 +25,15 @@ public class Ra8875
         IDigitalOutputPort litePort,
         IDigitalOutputPort chipSelect,
         IDigitalInputPort waitPort,
-        int width,
-        int height)
+        DisplayType displayType)
     {
         _spiBus = spiBus;
         _resetPort = resetPort;
         _litePort = litePort;
         _chipSelect = chipSelect;
         _waitPort = waitPort;
+        
+        
         _height = height;
         _width = width;
         
