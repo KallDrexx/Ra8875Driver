@@ -1,23 +1,17 @@
 ﻿using Meadow.Hardware;
-using Ra8875Driver.Constants;
+using Ra8875Driver.Displays;
 
 namespace Ra8875Driver;
 
 public class Ra8875
 {
-    private const byte CommandWriteByte = 0b10000000;
-    private const byte CommandReadByte = 0b11000000;
-    private const byte DataWriteByte = 0b00000000;
-    private const byte DataReadByte = 0b01000000;
-    
-    private readonly ISpiBus _spiBus;
     private readonly IDigitalOutputPort _resetPort;
     private readonly IDigitalInputPort _waitPort;
     private readonly IDigitalOutputPort _litePort;
-    private readonly IDigitalOutputPort _chipSelect;
+    private readonly RegisterCommunicator _registerCommunicator;
     private readonly byte[] _outputBuffer = new byte[2];
     private readonly int _height, _width;
-    private readonly DisplayType _displayType;
+    private readonly DisplayInfo _displayInfo;
 
     public Ra8875(
         ISpiBus spiBus,
@@ -27,60 +21,83 @@ public class Ra8875
         IDigitalInputPort waitPort,
         DisplayType displayType)
     {
-        _spiBus = spiBus;
         _resetPort = resetPort;
         _litePort = litePort;
-        _chipSelect = chipSelect;
         _waitPort = waitPort;
-        
-        
-        _height = height;
-        _width = width;
-        
+        _registerCommunicator = new RegisterCommunicator(spiBus, chipSelect);
+
+        _displayInfo = displayType switch
+        {
+            DisplayType.Lcd800X480 => new Lcd800X480(),
+            _ => throw new NotSupportedException($"{displayType} not supported"),
+        };
+
+        _height = _displayInfo.Height;
+        _width = _displayInfo.Width;
+
         Initialize();
     }
 
     private void Initialize()
     {
-        // TODO: Code currently specific to 800x480 display
-        InitializePll();
-        WriteRegister(Registers.SysR, SysR.ColorDepth16Bpp & SysR.Mcu8Bit);
-        WriteRegister(Registers.Pcsr, Pcsr.FetchedFallingEdge & Pcsr.SystemClockX2);
-        Thread.Sleep(1);
+        var initOptions = _displayInfo.InitOptions;
         
-        // Horizontal setup
-        var fineTuning = Hndftr.LowPolarity & 0x11;
-        WriteRegister(Registers.Hdwr, (byte)(_width / 8 - 1)); 
-        WriteRegister(Registers.Hndftr, Hndftr.LowPolarity & 0x11); // fine tuning
-        // WriteRegister(Registers.Hndr, _width ); // pixels = (hndr + 1)*8 + (hdnftr/2 + 1)*2 + 2
-    }
+        // A lot of these options came from the official adafruit arduino driver at 
+        // https://github.com/adafruit/Adafruit_RA8875/blob/master/Adafruit_RA8875.cpp.  
+        // It's not clear how they came up with all these calculations as they don't 
+        // totally match the data sheet.
 
-    private void InitializePll()
-    {
-        WriteRegister(Registers.PllC1, Pll.DivNLarge);
+        _registerCommunicator.WriteRegister(Registers.PllC1, initOptions.PllC1);
         Thread.Sleep(1);
-        WriteRegister(Registers.PllC2, Pll.DivKStandard);
+        _registerCommunicator.WriteRegister(Registers.PllC2, initOptions.PllC2);
         Thread.Sleep(1);
+
+        var initRegisters = new[]
+        {
+            new RegisterValue(Registers.SysR, SysR.ColorDepth16Bpp & SysR.Mcu8Bit),
+            new RegisterValue(Registers.Pcsr, initOptions.PixelClock),
+
+            // Horizontal setup
+            new RegisterValue(Registers.Hdwr, (byte)(_width / 8 - 1)),
+            new RegisterValue(Registers.Hndftr, (byte)(Hndftr.HighPolarity & initOptions.HSyncFineTuning)),
+            new RegisterValue(Registers.Hndr,
+                (byte)((initOptions.HSyncNonDisplayPixels - initOptions.HSyncFineTuning - 2) / 8)),
+
+            new RegisterValue(Registers.Hstr, (byte)(initOptions.HSyncStartPixel / 8 - 1)),
+            new RegisterValue(Registers.HPwr, (byte)(initOptions.HSyncPw / 8 - 1)),
+
+            // Vertical setup
+            new RegisterValue(Registers.Vdhr0, (byte)((_height - 1 + initOptions.VerticalOffset) & 0xFF)),
+            new RegisterValue(Registers.Vdhr1, (byte)((_height - 1 + initOptions.VerticalOffset) >> 8)),
+            new RegisterValue(Registers.Vndr0, (byte)(initOptions.HSyncNonDisplayPixels - 1)),
+            new RegisterValue(Registers.Vndr1, 0),
+            new RegisterValue(Registers.Vstr0, (byte)(initOptions.VSyncStartPixels - 1)),
+            new RegisterValue(Registers.Vstr1, 0),
+            new RegisterValue(Registers.Vpwr, (byte)(initOptions.VSyncPw - 1)),
+
+            // Set active window
+            new RegisterValue(Registers.Hsaw0, 0),
+            new RegisterValue(Registers.Hsaw1, 0),
+            new RegisterValue(Registers.Heaw0, (byte)((_width - 1) & 0xFF)),
+            new RegisterValue(Registers.Heaw1, (byte)((_width - 1) >> 8)),
+            new RegisterValue(Registers.Vsaw0, initOptions.VerticalOffset),
+            new RegisterValue(Registers.Vsaw1, initOptions.VerticalOffset),
+            new RegisterValue(Registers.Veaw0, (byte)((_height - 1 + initOptions.VerticalOffset) & 0xff)),
+            new RegisterValue(Registers.Veaw1, (byte)((_height - 1 + initOptions.VerticalOffset) >> 8)),
+        };
+        
+        _registerCommunicator.WriteRegisters(initRegisters);
+        
+        ClearDisplay(true);
     }
 
-    private void WriteCommand(byte command)
+    public void ClearDisplay(bool fullScreen)
     {
-        _outputBuffer[0] = CommandWriteByte;
-        _outputBuffer[1] = command;
-        _spiBus.Write(_chipSelect, _outputBuffer);
-    }
-
-    private void WriteData(byte data)
-    {
-        _outputBuffer[0] = DataWriteByte;
-        _outputBuffer[1] = data;
-        _spiBus.Write(_chipSelect, _outputBuffer);
-    }
-
-    private void WriteRegister(byte register, byte data)
-    {
-        // TODO: Figure out if we can do this in one Spi?
-        WriteCommand(register);
-        WriteData(data);
+        const byte startClearFunction = 0b10000000;
+        const byte clearFullDisplay = 0b00000000;
+        const byte clearActiveWindow = 0b01000000;
+        var clearCommand = (byte)(startClearFunction & (fullScreen ? clearFullDisplay : clearActiveWindow));
+        
+        _registerCommunicator.WriteRegister(Registers.Mclr, clearCommand);
     }
 }

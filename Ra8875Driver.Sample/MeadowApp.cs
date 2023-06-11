@@ -15,7 +15,7 @@ public class MeadowApp : App<F7FeatherV2>
         var chipSelect = Device.CreateDigitalOutputPort(Device.Pins.D01, true);
         var lite = Device.CreateDigitalOutputPort(Device.Pins.D13);
 
-        _ra8875 = new Ra8875(spiBus, resetPort, lite, chipSelect, waitPort, 800, 480);
+        _ra8875 = new Ra8875(spiBus, resetPort, lite, chipSelect, waitPort, DisplayType.Lcd800X480);
 
         return Task.CompletedTask;
     }

@@ -1,4 +1,13 @@
-namespace Ra8875Driver.Constants;
+﻿namespace Ra8875Driver;
+
+/// <summary>
+/// Horizontal Non-Display Period Fine Tuning Option Register
+/// </summary>
+internal static class Hndftr
+{
+    public const byte HighPolarity = 0b10000000;
+    public const byte LowPolarity = 0b00000000;
+}
 
 /// <summary>
 /// Pixel clock setting register
@@ -36,4 +45,31 @@ internal class Pcsr
     public const byte SystemClockX8 = 0b00000011;
 
 
+}
+
+internal static class Pll
+{
+    /// <summary>
+    /// PLLDIVK: divided by 4. Samples all use this
+    /// </summary>
+    public const byte DivKStandard = 0b00000010;
+
+    /// <summary>
+    /// PLLDIVN value for 320x240 and 480x272 displays
+    /// </summary>
+    public const byte DivNSmall = 10;
+
+    /// <summary>
+    /// PLLDIVN value for 640x480 and 800x480 displays
+    /// </summary>
+    public const byte DivNLarge = 11;
+}
+
+internal static class SysR
+{
+    public const byte ColorDepth8Bpp = 0b00000000;
+    public const byte ColorDepth16Bpp = 0b00001100;
+
+    public const byte Mcu8Bit = 0b00000000;
+    public const byte Mcu16Bit = 0b00000011;
 }

@@ -4,17 +4,13 @@ internal class DisplayInitializationOptions
 {
     public required byte PllC1 { get; init; }
     public required byte PllC2 { get; init; }
-    public required byte SysR { get; init; }
-    public required byte Pcsr { get; init; }
-    public required byte Hdwr { get; init; }
-    public required byte Hndftr { get; init; }
-    public required byte Hndr { get; init; }
-    public required byte Hstr { get; init; }
-    public required byte Vdhr0 { get; init; }
-    public required byte Vdhr1 { get; init; }
-    public required byte Vndr0 { get; init; }
-    public required byte Vndr1 { get; init; }
-    public required byte Vstr0 { get; init; }
-    public required byte Vstr1 { get; init; }
-    public required byte Vpwr { get; init; }
+    public required byte PixelClock { get; init; }
+    public required byte HSyncNonDisplayPixels { get; init; }
+    public required byte HSyncStartPixel { get; init; }
+    public required byte HSyncPw { get; init; }
+    public required byte HSyncFineTuning { get; init; }
+    public required byte VSyncPw { get; init; }
+    public required ushort VSyncNonDisplayPixels { get; init; }
+    public required ushort VSyncStartPixels { get; init; }
+    public required byte VerticalOffset { get; init; }
 }
