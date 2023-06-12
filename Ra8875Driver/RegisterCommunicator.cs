@@ -6,7 +6,6 @@ internal readonly record struct RegisterValue(Registers Register, byte Value);
 
 internal class RegisterCommunicator
 {
-    
     private const byte CommandWriteByte = 0b10000000;
     private const byte CommandReadByte = 0b11000000;
     private const byte DataWriteByte = 0b00000000;
