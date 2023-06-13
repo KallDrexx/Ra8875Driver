@@ -7,7 +7,7 @@ internal class Lcd800X480 : DisplayInfo
 
     public override byte PllC1 => Initializer.Pll.DivNLarge;
     public override byte PllC2 => Initializer.Pll.DivKStandard;
-    public override byte PixelClock => Initializer.Pcsr.FetchedFallingEdge & Initializer.Pcsr.SystemClockX2;
+    public override byte PixelClock => Initializer.Pcsr.FetchedFallingEdge | Initializer.Pcsr.SystemClockX2;
     public override byte HSyncFineTuning => 0;
     public override byte HSyncNonDisplayPixels => 26;
     public override byte HSyncStartPixel => 32;

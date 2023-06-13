@@ -35,11 +35,12 @@ public class Ra8875
         _height = _displayInfo.Height;
         _width = _displayInfo.Width;
 
-        Initialize();
-    }
+        // Reset device
+        _resetPort.State = false;
+        Thread.Sleep(1);
+        _resetPort.State = true;
+        Thread.Sleep(10);
 
-    private void Initialize()
-    {
         Initializer.Initialize(_registerCommunicator, _displayInfo);
         
         ClearDisplay(true);
@@ -50,8 +51,20 @@ public class Ra8875
         const byte startClearFunction = 0b10000000;
         const byte clearFullDisplay = 0b00000000;
         const byte clearActiveWindow = 0b01000000;
-        var clearCommand = (byte)(startClearFunction & (fullScreen ? clearFullDisplay : clearActiveWindow));
+        var clearCommand = (byte)(startClearFunction | (fullScreen ? clearFullDisplay : clearActiveWindow));
         
         _registerCommunicator.WriteRegister(Registers.Mclr, clearCommand);
+    }
+
+    public void SetDisplayOn(bool enabled)
+    {
+        _registerCommunicator.WriteRegister(Registers.Pwrr, (byte)(enabled ? 0x80 : 0x00));
+        
+        // Enable backlight
+        _registerCommunicator.WriteRegister(Registers.GpioX, 0x01);
+        
+        var pwm1Value = (byte)((enabled ? 0x80 : 0x00) | 0x0a);
+        _registerCommunicator.WriteRegister(Registers.P1Cr, pwm1Value);
+        _registerCommunicator.WriteRegister(Registers.P1Dcr, 0xff);
     }
 }

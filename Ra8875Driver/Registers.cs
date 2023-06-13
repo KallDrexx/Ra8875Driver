@@ -3,6 +3,11 @@ namespace Ra8875Driver;
 internal enum Registers : byte
 {
     /// <summary>
+    /// Power and Display Control Register
+    /// </summary>
+    Pwrr = 0x01,
+    
+    /// <summary>
     /// Pixel clock setting register
     /// </summary>
     Pcsr = 0x04,
@@ -116,7 +121,22 @@ internal enum Registers : byte
     PllC2 = 0x89,
    
     /// <summary>
+    /// PWM1 control register
+    /// </summary>
+    P1Cr = 0x8a,
+   
+    /// <summary>
+    /// PWM1 duty control register
+    /// </summary>
+    P1Dcr = 0x8b,
+   
+    /// <summary>
     /// Memory clear control register
     /// </summary>
     Mclr = 0x8e,
+   
+    /// <summary>
+    /// Extra general purpose IO register
+    /// </summary>
+    GpioX = 0xc7,
 }

@@ -20,12 +20,12 @@ internal static class Initializer
 
         var initRegisters = new[]
         {
-            new RegisterValue(Registers.SysR, SysR.ColorDepth16Bpp & SysR.Mcu8Bit),
+            new RegisterValue(Registers.SysR, SysR.ColorDepth16Bpp | SysR.Mcu8Bit),
             new RegisterValue(Registers.Pcsr, display.PixelClock),
 
             // Horizontal setup
             new RegisterValue(Registers.Hdwr, (byte)(display.Width / 8 - 1)),
-            new RegisterValue(Registers.Hndftr, (byte)(Hndftr.HighPolarity & display.HSyncFineTuning)),
+            new RegisterValue(Registers.Hndftr, (byte)(Hndftr.HighPolarity | display.HSyncFineTuning)),
             new RegisterValue(Registers.Hndr,
                 (byte)((display.HSyncNonDisplayPixels - display.HSyncFineTuning - 2) / 8)),
 
