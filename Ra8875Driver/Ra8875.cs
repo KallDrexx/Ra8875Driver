@@ -58,6 +58,13 @@ public class Ra8875
 
     public void SetDisplayOn(bool enabled)
     {
+
+        var readBuffer = new byte[] { 0, 0, 0};
+        var writeBuffer = new byte[] { 0x01, 0, 0 };
+        _registerCommunicator._spiBus.Exchange(_registerCommunicator._chipSelect, writeBuffer, readBuffer);
+        
+        // Write the results of readbuffer to the console in hex
+        Console.WriteLine($"Read buffer: {BitConverter.ToString(readBuffer)}");
         _registerCommunicator.WriteRegister(Registers.Pwrr, (byte)(enabled ? 0x80 : 0x00));
         
         // Enable backlight
@@ -66,5 +73,6 @@ public class Ra8875
         var pwm1Value = (byte)((enabled ? 0x80 : 0x00) | 0x0a);
         _registerCommunicator.WriteRegister(Registers.P1Cr, pwm1Value);
         _registerCommunicator.WriteRegister(Registers.P1Dcr, 0xff);
+        
     }
 }

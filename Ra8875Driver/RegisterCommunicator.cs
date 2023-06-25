@@ -10,10 +10,11 @@ internal class RegisterCommunicator
     private const byte CommandReadByte = 0b11000000;
     private const byte DataWriteByte = 0b00000000;
     private const byte DataReadByte = 0b01000000;
-    
-    private readonly ISpiBus _spiBus;
-    private readonly IDigitalOutputPort _chipSelect;
+
+    public readonly ISpiBus _spiBus;
+    public readonly IDigitalOutputPort _chipSelect;
     private readonly byte[] _outputBuffer = new byte[2];
+    private readonly byte[] _inputBuffer = new byte[2];
 
     public RegisterCommunicator(ISpiBus spiBus, IDigitalOutputPort chipSelect)
     {
@@ -28,7 +29,7 @@ internal class RegisterCommunicator
             WriteRegister(toWrite.Register, toWrite.Value);
         }
     }
-    
+
     public void WriteRegister(Registers register, byte data)
     {
         // TODO: Figure out if we can do this in one Spi call?
@@ -36,17 +37,35 @@ internal class RegisterCommunicator
         WriteData(data);
     }
 
+    public byte ReadRegister(Registers register)
+    {
+        WriteCommand((byte)register);
+        return ReadData();
+    }
+
     private void WriteCommand(byte command)
     {
         _outputBuffer[0] = CommandWriteByte;
         _outputBuffer[1] = command;
-        _spiBus.Write(_chipSelect, _outputBuffer);
+        _spiBus.Write(_chipSelect, _outputBuffer.AsSpan(0, 2));
     }
 
     private void WriteData(byte data)
     {
         _outputBuffer[0] = DataWriteByte;
         _outputBuffer[1] = data;
-        _spiBus.Write(_chipSelect, _outputBuffer);
+        _spiBus.Write(_chipSelect, _outputBuffer.AsSpan(0, 2));
+    }
+
+    private byte ReadData()
+    {
+        _outputBuffer[0] = DataReadByte;
+        _outputBuffer[1] = 0;
+        _inputBuffer[0] = 0;
+        _inputBuffer[1] = 0;
+
+        _spiBus.Exchange(_chipSelect, _outputBuffer.AsSpan(0, 2), _inputBuffer.AsSpan(0, 2));
+
+        return _inputBuffer[1];
     }
 }

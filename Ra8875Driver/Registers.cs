@@ -3,6 +3,11 @@ namespace Ra8875Driver;
 internal enum Registers : byte
 {
     /// <summary>
+    /// Status register
+    /// </summary>
+    Stsr = 0x00,
+    
+    /// <summary>
     /// Power and Display Control Register
     /// </summary>
     Pwrr = 0x01,

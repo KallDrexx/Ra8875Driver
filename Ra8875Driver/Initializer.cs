@@ -8,6 +8,16 @@ internal static class Initializer
         RegisterCommunicator registerCommunicator,
         DisplayInfo display)
     {
+        // We can confirm we have a valid connection to the device by reading the status register.
+        // It's not clear why the initial status register is 0x75 from the data sheet, but that 
+        // seems to be the case.
+        var status = registerCommunicator.ReadRegister(Registers.Stsr);
+        if (status != 0x75)
+        {
+            var message = $"Invalid initial status of 0x{status:x2} received, expected 0x75";
+            throw new InvalidOperationException(message);
+        }
+        
         // A lot of these options came from the official adafruit arduino driver at 
         // https://github.com/adafruit/Adafruit_RA8875/blob/master/Adafruit_RA8875.cpp.  
         // It's not clear how they came up with all these calculations as they don't 
