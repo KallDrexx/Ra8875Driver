@@ -121,6 +121,21 @@ internal enum Registers : byte
     /// Vertical end point of active window 1
     /// </summary>
     Veaw1 = 0x37,
+   
+    /// <summary>
+    /// Foreground color register 0 (Red)
+    /// </summary>
+    Fgcr0 = 0x63,
+   
+    /// <summary>
+    /// Foreground color register 1 (Green)
+    /// </summary>
+    Fgcr1 = 0x64,
+   
+    /// <summary>
+    /// Foreground color register 2 (Blue)
+    /// </summary>
+    Fgcr2 = 0x65,
     
     PllC1 = 0x88,
     PllC2 = 0x89,
@@ -139,6 +154,36 @@ internal enum Registers : byte
     /// Memory clear control register
     /// </summary>
     Mclr = 0x8e,
+    
+    /// <summary>
+    /// Draw line / circle / square register
+    /// </summary>
+    Dcr = 0x90,
+   
+    /// <summary>
+    /// Draw circle center horizontal address register 0
+    /// </summary>
+    Dchr0 = 0x99,
+   
+    /// <summary>
+    /// Draw circle center horizontal address register 1
+    /// </summary>
+    Dchr1 = 0x9a,
+   
+    /// <summary>
+    /// Draw circle center vertical address register 0
+    /// </summary>
+    Dcvr0 = 0x9b,
+   
+    /// <summary>
+    /// Draw circle center vertical address register 1
+    /// </summary>
+    Dcvr1 = 0x9c,
+   
+    /// <summary>
+    /// Draw circle radius register
+    /// </summary>
+    Dcrr = 0x9d,
    
     /// <summary>
     /// Extra general purpose IO register

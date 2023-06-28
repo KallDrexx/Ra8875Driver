@@ -45,7 +45,7 @@ internal static class Initializer
             // Vertical setup
             new RegisterValue(Registers.Vdhr0, (byte)((display.Height - 1 + display.VerticalOffset) & 0xFF)),
             new RegisterValue(Registers.Vdhr1, (byte)((display.Height - 1 + display.VerticalOffset) >> 8)),
-            new RegisterValue(Registers.Vndr0, (byte)(display.HSyncNonDisplayPixels - 1)),
+            new RegisterValue(Registers.Vndr0, (byte)(display.VsyncNonDisplayPixels - 1)),
             new RegisterValue(Registers.Vndr1, 0),
             new RegisterValue(Registers.Vstr0, (byte)(display.VSyncStartPixels - 1)),
             new RegisterValue(Registers.Vstr1, 0),
@@ -73,32 +73,32 @@ internal static class Initializer
         /// <summary>
         /// Pixel data fetched at rising edge
         /// </summary>
-        public const byte FetchedRisingEdge = 0b0000000;
+        public const byte FetchedRisingEdge = 0x00;
 
         /// <summary>
         /// Pixel data fetched at falling edge
         /// </summary>
-        public const byte FetchedFallingEdge = 0b1000000;
+        public const byte FetchedFallingEdge = 0x80;
 
         /// <summary>
         /// Pixel clock set to the system clock period
         /// </summary>
-        public const byte SystemClockX1 = 0b00000000;
+        public const byte SystemClockX1 = 0x00;
 
         /// <summary>
         /// Pixel clock set to 2 times the pixel clock period
         /// </summary>
-        public const byte SystemClockX2 = 0b00000001;
+        public const byte SystemClockX2 = 0x01;
 
         /// <summary>
         /// Pixel clock set to 4 times the pixel clock period
         /// </summary>
-        public const byte SystemClockX4 = 0b00000010;
+        public const byte SystemClockX4 = 0x02;
 
         /// <summary>
         /// Pixel clock set to 8 times the pixel clock period
         /// </summary>
-        public const byte SystemClockX8 = 0b00000011;
+        public const byte SystemClockX8 = 0x03;
     }
 
     internal static class Pll
@@ -124,8 +124,8 @@ internal static class Initializer
     /// </summary>
     private static class Hndftr
     {
-        public const byte HighPolarity = 0b10000000;
-        public const byte LowPolarity = 0b00000000;
+        public const byte HighPolarity = 0x00;
+        public const byte LowPolarity = 0x80;
     }
 
     private static class SysR
