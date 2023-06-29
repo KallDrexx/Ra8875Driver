@@ -69,6 +69,11 @@ public class Ra8875
         _registerCommunicator.WriteRegister(Registers.P1Dcr, 0xff);
         
     }
+    
+    public void DrawRect(ushort x, ushort y, ushort width, ushort height, Color color, bool fill)
+    {
+        _geometryDrawing.DrawRect(x, y, width, height, color, fill);
+    }
 
     public void DrawCircle(ushort centerX, ushort centerY, byte radius, Color color, bool fill)
     {

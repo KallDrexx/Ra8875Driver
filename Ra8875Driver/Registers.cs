@@ -161,6 +161,46 @@ internal enum Registers : byte
     Dcr = 0x90,
    
     /// <summary>
+    /// Draw line/square horizontal start address register 0
+    /// </summary>
+    Dlhsr0 = 0x91,
+   
+    /// <summary>
+    /// Draw line/square horizontal start address register 1
+    /// </summary>
+    Dlhsr1 = 0x92,
+   
+    /// <summary>
+    /// Draw line/square vertical start address register 0
+    /// </summary>
+    Dlvsr0 = 0x93,
+   
+    /// <summary>
+    /// Draw line/square vertical start address register 1
+    /// </summary>
+    Dlvsr1 = 0x94,
+    
+    /// <summary>
+    /// Draw line/square end horizontal address register 0
+    /// </summary>
+    Dlher0 = 0x95,
+   
+    /// <summary>
+    /// Draw line/square end horizontal address register 1
+    /// </summary>
+    Dlher1 = 0x96,
+   
+    /// <summary>
+    /// Draw line/square end vertical address register 0
+    /// </summary>
+    Dlver0 = 0x97,
+   
+    /// <summary>
+    /// Draw line/square end vertical address register 1
+    /// </summary>
+    Dlver1 = 0x98,
+   
+    /// <summary>
     /// Draw circle center horizontal address register 0
     /// </summary>
     Dchr0 = 0x99,

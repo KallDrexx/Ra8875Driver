@@ -15,10 +15,9 @@ public class MeadowApp : App<F7FeatherV2>
         var config = new SpiClockConfiguration(
             new Frequency(3000, Frequency.UnitType.Kilohertz),
             SpiClockConfiguration.Mode.Mode0);
-        var spiBus = new DebuggingSpiBus(Device.CreateSpiBus(Device.Pins.SCK, Device.Pins.COPI, Device.Pins.CIPO, config))
-        {
-            LogInputOutput = true,
-        };
+        
+        var spiBus =
+            new DebuggingSpiBus(Device.CreateSpiBus(Device.Pins.SCK, Device.Pins.COPI, Device.Pins.CIPO, config));
         
         var waitPort = Device.CreateDigitalInputPort(Device.Pins.D13);
         var resetPort = Device.CreateDigitalOutputPort(Device.Pins.D04, false);
@@ -31,8 +30,9 @@ public class MeadowApp : App<F7FeatherV2>
         _ra8875.SetDisplayOn(true);
         
         Console.WriteLine("Display started");
-        
-        _ra8875.DrawCircle(100, 100, 25, Color.Aqua, true);
+
+        _ra8875.DrawRect(50, 50, 200, 200, Color.Aqua, true);
+        // _ra8875.DrawCircle(0, 0, 25, Color.Aqua, true);
 
         return Task.CompletedTask;
     }
