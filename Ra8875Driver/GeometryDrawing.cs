@@ -4,9 +4,7 @@ namespace Ra8875Driver;
 
 internal class GeometryDrawing
 {
-    private const byte StartLineSquareTriangleDraw = 0b10000000;
-    private const byte StartCircleDraw = 0b01000000;
-    private const byte DrawFilled = 0b00100000;
+    private const byte DcrFill = 0x20;
     
     private readonly RegisterCommunicator _registerCommunicator;
 
@@ -17,6 +15,9 @@ internal class GeometryDrawing
 
     public void DrawRect(ushort x0, ushort y0, ushort x1, ushort y1, Color color, bool fill)
     {
+        const byte dcrDrawSquare = 0x10;
+        const byte dcrDrawSquareStart = 0x80;
+        
         _registerCommunicator.WriteRegister(Registers.Dlhsr0, (byte)x0);
         _registerCommunicator.WriteRegister(Registers.Dlhsr1, (byte)(x0 >> 8));
         _registerCommunicator.WriteRegister(Registers.Dlvsr0, (byte)y0);
@@ -27,34 +28,39 @@ internal class GeometryDrawing
         _registerCommunicator.WriteRegister(Registers.Dlver1, (byte)(y1 >> 8));
         
         // Color
-        var rawColor = color.Color16bppRgb565;
-        _registerCommunicator.WriteRegister(Registers.Fgcr0, (byte)((rawColor & 0xF800) >> 11));
-        _registerCommunicator.WriteRegister(Registers.Fgcr1, (byte)((rawColor & 0x07e0) >> 5));
-        _registerCommunicator.WriteRegister(Registers.Fgcr2, (byte)(rawColor & 0x001f));
+        var (red, green, blue) = color.ToRgb();
+        _registerCommunicator.WriteRegister(Registers.Fgcr0, red);
+        _registerCommunicator.WriteRegister(Registers.Fgcr1, green);
+        _registerCommunicator.WriteRegister(Registers.Fgcr2, blue);
 
-        var data = fill ? 0xB0 : 0x90;
+        var data = dcrDrawSquareStart | dcrDrawSquare;
+        if (fill) data |= DcrFill;
         _registerCommunicator.WriteRegister(Registers.Dcr, (byte)data);
     }
 
     public void DrawCircle(ushort centerX, ushort centerY, byte radius, Color color, bool fill)
     {
+        const byte dcrStartCircleDraw = 0x40;
+        
         // X and y0 position
-        _registerCommunicator.WriteRegister(Registers.Dchr0, (byte)(centerX & 0xFF));
+        _registerCommunicator.WriteRegister(Registers.Dchr0, (byte)centerX);
         _registerCommunicator.WriteRegister(Registers.Dchr1, (byte)(centerX >> 8));
-        _registerCommunicator.WriteRegister(Registers.Dcvr0, (byte)(centerY & 0xFF));
+        _registerCommunicator.WriteRegister(Registers.Dcvr0, (byte)centerY);
         _registerCommunicator.WriteRegister(Registers.Dcvr1, (byte)(centerY >> 8));
         
         // Radius
         _registerCommunicator.WriteRegister(Registers.Dcrr, radius);
         
         // Color
-        var rawColor = color.Color16bppRgb565;
-        _registerCommunicator.WriteRegister(Registers.Fgcr0, (byte)((rawColor & 0xF800) >> 11));
-        _registerCommunicator.WriteRegister(Registers.Fgcr1, (byte)((rawColor & 0x07e0) >> 5));
-        _registerCommunicator.WriteRegister(Registers.Fgcr2, (byte)(rawColor & 0x001f));
+        var (red, green, blue) = color.ToRgb();
+        _registerCommunicator.WriteRegister(Registers.Fgcr0, red);
+        _registerCommunicator.WriteRegister(Registers.Fgcr1, green);
+        _registerCommunicator.WriteRegister(Registers.Fgcr2, blue);
         
         // Draw
-        var command = (byte)(StartCircleDraw & (fill ? DrawFilled : 0));
-        _registerCommunicator.WriteRegister(Registers.Dcr, command);
+        var data = dcrStartCircleDraw;
+        if (fill) data |= DcrFill;
+        Console.WriteLine($"Data: {data:x2}");
+        _registerCommunicator.WriteRegister(Registers.Dcr, (byte)data);
     }
 }

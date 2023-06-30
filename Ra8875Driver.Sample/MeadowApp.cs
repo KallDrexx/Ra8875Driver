@@ -32,7 +32,7 @@ public class MeadowApp : App<F7FeatherV2>
         Console.WriteLine("Display started");
 
         _ra8875.DrawRect(50, 50, 200, 200, Color.Aqua, true);
-        // _ra8875.DrawCircle(0, 0, 25, Color.Aqua, true);
+        _ra8875.DrawCircle(100, 100, 25, Color.Green, true);
 
         return Task.CompletedTask;
     }
