@@ -70,13 +70,23 @@ public class Ra8875
         
     }
     
-    public void DrawRect(ushort x, ushort y, ushort width, ushort height, Color color, bool fill)
+    public void DrawRect(ushort x0, ushort y0, ushort x1, ushort y1, Color color, bool fill)
     {
-        _geometryDrawing.DrawRect(x, y, width, height, color, fill);
+        _geometryDrawing.DrawRect(x0, y0, x1, y1, color, fill);
     }
 
     public void DrawCircle(ushort centerX, ushort centerY, byte radius, Color color, bool fill)
     {
         _geometryDrawing.DrawCircle(centerX, centerY, radius, color, fill);
+    }
+    
+    public void DrawLine(ushort x0, ushort y0, ushort x1, ushort y1, Color color)
+    {
+        _geometryDrawing.DrawLine(x0, y0, x1, y1, color);
+    }
+    
+    public void DrawTriangle(ushort x0, ushort y0, ushort x1, ushort y1, ushort x2, ushort y2, Color color, bool fill)
+    {
+        _geometryDrawing.DrawTriangle(x0, y0, x1, y1, x2, y2, color, fill);
     }
 }

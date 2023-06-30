@@ -226,6 +226,26 @@ internal enum Registers : byte
     Dcrr = 0x9d,
    
     /// <summary>
+    /// Draw triangle point 2 horizontal address register 0
+    /// </summary>
+    Dtph0 = 0xa9,
+   
+    /// <summary>
+    /// Draw triangle point 2 horizontal address register 1
+    /// </summary>
+    Dtph1 = 0xaa,
+   
+    /// <summary>
+    /// Draw triangle point 2 horizontal address register 0
+    /// </summary>
+    Dtpv0 = 0xab,
+    
+    /// <summary>
+    /// Draw triangle point 2 horizontal address register 1
+    /// </summary>
+    Dtpv1 = 0xac,
+   
+    /// <summary>
     /// Extra general purpose IO register
     /// </summary>
     GpioX = 0xc7,

@@ -33,6 +33,8 @@ public class MeadowApp : App<F7FeatherV2>
 
         _ra8875.DrawRect(50, 50, 200, 200, Color.Aqua, true);
         _ra8875.DrawCircle(100, 100, 25, Color.Green, true);
+        _ra8875.DrawLine(0, 0, 800, 480, Color.Yellow);
+        _ra8875.DrawTriangle(100, 100, 100, 200, 150, 150, Color.Red, true);
 
         return Task.CompletedTask;
     }
