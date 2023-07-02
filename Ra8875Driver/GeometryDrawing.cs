@@ -7,10 +7,12 @@ internal class GeometryDrawing
     private const byte DcrFill = 0x20;
 
     private readonly RegisterCommunicator _registerCommunicator;
+    private readonly Waiter _waiter;
 
-    public GeometryDrawing(RegisterCommunicator registerCommunicator)
+    public GeometryDrawing(RegisterCommunicator registerCommunicator, Waiter waiter)
     {
         _registerCommunicator = registerCommunicator;
+        _waiter = waiter;
     }
 
     public void DrawRect(ushort x0, ushort y0, ushort x1, ushort y1, Color color, bool fill)
@@ -40,7 +42,9 @@ internal class GeometryDrawing
             new RegisterValue(Registers.Dcr, (byte)startDrawOperation),
         };
 
+        _waiter.WaitForReady();
         _registerCommunicator.WriteRegisters(dataToWrite);
+        _waiter.SetNextWait(Registers.Dcr, dcrDrawSquareStart);
     }
 
     public void DrawCircle(ushort centerX, ushort centerY, byte radius, Color color, bool fill)
@@ -69,7 +73,9 @@ internal class GeometryDrawing
             new RegisterValue(Registers.Dcr, startDrawOperation),
         };
 
+        _waiter.WaitForReady();
         _registerCommunicator.WriteRegisters(dataToWrite);
+        _waiter.SetNextWait(Registers.Dcr, dcrStartCircleDraw);
     }
 
     public void DrawLine(ushort x0, ushort y0, ushort x1, ushort y1, Color color)
@@ -96,7 +102,9 @@ internal class GeometryDrawing
             new RegisterValue(Registers.Dcr, dcrDrawLine),
         };
 
+        _waiter.WaitForReady();
         _registerCommunicator.WriteRegisters(dataToWrite);
+        _waiter.SetNextWait(Registers.Dcr, dcrDrawLine);
     }
 
     public void DrawTriangle(ushort x0, ushort y0, ushort x1, ushort y1, ushort x2, ushort y2, Color color, bool fill)
@@ -129,6 +137,8 @@ internal class GeometryDrawing
             new RegisterValue(Registers.Dcr, startDrawOperation),
         };
 
+        _waiter.WaitForReady();
         _registerCommunicator.WriteRegisters(dataToWrite);
+        _waiter.SetNextWait(Registers.Dcr, 0x80);
     }
 }

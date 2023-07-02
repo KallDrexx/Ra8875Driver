@@ -8,13 +8,11 @@ internal static class Initializer
         RegisterCommunicator registerCommunicator,
         DisplayInfo display)
     {
-        // We can confirm we have a valid connection to the device by reading the status register.
-        // It's not clear why the initial status register is 0x75 from the data sheet, but that 
-        // seems to be the case.
+        var resetStatusMask = 0x71;
         var status = registerCommunicator.ReadRegister(Registers.Stsr);
-        if (status != 0x75)
+        if ((status & resetStatusMask) != 0x71)
         {
-            var message = $"Invalid initial status of 0x{status:x2} received, expected 0x75";
+            var message = $"Invalid initial status of 0x{status:x2} received";
             throw new InvalidOperationException(message);
         }
         
