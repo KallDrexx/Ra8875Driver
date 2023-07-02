@@ -13,8 +13,8 @@ internal class RegisterCommunicator
 
     public readonly ISpiBus _spiBus;
     public readonly IDigitalOutputPort _chipSelect;
-    private readonly byte[] _outputBuffer = new byte[2];
-    private readonly byte[] _inputBuffer = new byte[2];
+    private readonly byte[] _outputBuffer = new byte[4];
+    private readonly byte[] _inputBuffer = new byte[4];
 
     public RegisterCommunicator(ISpiBus spiBus, IDigitalOutputPort chipSelect)
     {
@@ -24,6 +24,8 @@ internal class RegisterCommunicator
 
     public void WriteRegisters(ReadOnlySpan<RegisterValue> valuesToWrite)
     {
+        // Writes seem to be able to be performed at 20Mhz
+        _spiBus.Configuration.SetActualSpeed(new Meadow.Units.Frequency(20, Meadow.Units.Frequency.UnitType.Megahertz));
         foreach (var toWrite in valuesToWrite)
         {
             WriteRegister(toWrite.Register, toWrite.Value);
@@ -32,13 +34,17 @@ internal class RegisterCommunicator
 
     public void WriteRegister(Registers register, byte data)
     {
-        // TODO: Figure out if we can do this in one Spi call?
-        WriteCommand((byte)register);
-        WriteData(data);
+        _outputBuffer[0] = CommandWriteByte;
+        _outputBuffer[1] = (byte)register;
+        _outputBuffer[2] = DataWriteByte;
+        _outputBuffer[3] = data;
+        _spiBus.Write(_chipSelect, _outputBuffer.AsSpan(0, 4));
     }
 
     public byte ReadRegister(Registers register)
     {
+        // Can't seem to reliably read data above 3Mhz spi
+        _spiBus.Configuration.SetActualSpeed(new Meadow.Units.Frequency(3, Meadow.Units.Frequency.UnitType.Megahertz));
         WriteCommand((byte)register);
         return ReadData();
     }
@@ -47,13 +53,6 @@ internal class RegisterCommunicator
     {
         _outputBuffer[0] = CommandWriteByte;
         _outputBuffer[1] = command;
-        _spiBus.Write(_chipSelect, _outputBuffer.AsSpan(0, 2));
-    }
-
-    private void WriteData(byte data)
-    {
-        _outputBuffer[0] = DataWriteByte;
-        _outputBuffer[1] = data;
         _spiBus.Write(_chipSelect, _outputBuffer.AsSpan(0, 2));
     }
 
